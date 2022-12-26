@@ -49,12 +49,14 @@ app.post("/register", async (request, response) => {
                 '${gender}',
                 '${location}'
             );`;
-    let newUserDetails = await db.run(postNewUserQuery);
-    response.status(200);
-    response.send("User created successfully");
-  } else if (password.length < 5) {
-    response.status(400);
-    response.send("Password is too short");
+    if (password.length < 5) {
+      response.status(400);
+      response.send("Password is too short");
+    } else {
+      let newUserDetails = await db.run(postNewUserQuery);
+      response.status(200);
+      response.send("User created successfully");
+    }
   } else {
     response.status(400);
     response.send("User already exists");
@@ -80,7 +82,7 @@ app.post("/login", async (request, response) => {
       response.send("Login success!");
     } else {
       response.status(400);
-      response.send("Invalid Password");
+      response.send("Invalid password");
     }
   }
 });
@@ -108,30 +110,18 @@ app.put("/change-password", async (request, response) => {
             password= '${hashedPassword}'; 
         WHERE 
             username= '${username}'`;
-      let newPass = await db.run(putUserDetails);
-      response.status(200);
-      response.send("Password updated");
-    } else {
       if (newPassword.length < 5) {
         response.status(400);
         response.send("Password is too short");
       } else {
-        response.status(400);
-        response.send("Invalid current password");
+        let newPass = await db.run(putUserDetails);
+        response.status(200);
+        response.send("Password updated");
       }
+    } else {
+      response.status(400);
+      response.send("Invalid current password");
     }
-  }
-
-  //let updatedPass = await db.run(putUserDetails);
-  if (newPassword.length < 5) {
-    response.status(400);
-    response.send("Password is too short");
-  } else if (newPassword.length < 5) {
-    response.status(400);
-    response.send("Invalid current password");
-  } else {
-    response.status(200);
-    response.send("Password updated");
   }
 });
 
